@@ -11,9 +11,8 @@ public class IntelligentDocProcessingApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(IntelligentDocProcessingApplication.class, args);
 	}
-	@Bean
-	public RestTemplate getRestTemplate() {
-		return new RestTemplate();
-	}
-
+	
+	/*
+	 * @Bean public RestTemplate getRestTemplate() { return new RestTemplate(); }
+	 */
 }
