@@ -23,13 +23,13 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 public class IDPAmazonS3ClientService {
 	private AmazonS3 s3client;
 
-    @Value("${amazonProperties.endpointUrl}")
+    @Value("${aws.endpointUrl}")
     private String endpointUrl;
-    @Value("${amazonProperties.bucketName}")
+    @Value("${aws.bucketName}")
     private String bucketName;
-    @Value("${amazonProperties.accessKey}")
+    @Value("${aws.accessKey}")
     private String accessKey;
-    @Value("${amazonProperties.secretKey}")
+    @Value("${aws.secretKey}")
     private String secretKey;
     
     @PostConstruct
