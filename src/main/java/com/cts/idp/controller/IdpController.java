@@ -90,6 +90,7 @@ public class IdpController {
 	}
 	@GetMapping("/processFiles")
 	public ResponseEntity<ResponseMessage> processFiles() {
+		service.processFiles();
 		return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(""));
 	}
 }

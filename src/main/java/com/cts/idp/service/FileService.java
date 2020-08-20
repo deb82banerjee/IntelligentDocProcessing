@@ -63,6 +63,10 @@ public class FileService {
 		
 		return false;
 	}
+	public boolean processFiles() {
+		//Need to send to Processing Engine
+		return true;
+	}
 	
 	
 }
