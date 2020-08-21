@@ -65,7 +65,12 @@ public class FileService {
 	}
 	public boolean processFiles() {
 		//Need to send to Processing Engine
-		return true;
+		List<Files> files = fileRepo.findAll();
+		for(Files file : files) {
+			byte[] fileData = file.getData();
+			//TODO: call Shuvrangshu's service for processing
+		}
+		return true; // also this should return object
 	}
 	
 	
