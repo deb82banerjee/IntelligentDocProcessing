@@ -19,14 +19,34 @@ public class Files {
 	
 	private String fileType;
 	
+	private String customerName;
+	
+	private boolean validated;
+	
+	private boolean processed;
+	
+	private boolean infoExtracted;
+	
+	private boolean docClassified;
+	
+	
+	
 	@Lob
 	private byte[] data;
 
-	public Files(String userId, String fileName, String fileType, byte[] data) {
+	
+
+	public Files(String userId, String fileName, String fileType, String customerName, boolean validated,
+			boolean processed, boolean infoExtracted, boolean docClassified, byte[] data) {
 		super();
 		this.userId = userId;
 		this.fileName = fileName;
 		this.fileType = fileType;
+		this.customerName = customerName;
+		this.validated = validated;
+		this.processed = processed;
+		this.infoExtracted = infoExtracted;
+		this.docClassified = docClassified;
 		this.data = data;
 	}
 
@@ -72,6 +92,46 @@ public class Files {
 
 	public void setData(byte[] data) {
 		this.data = data;
+	}
+
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+	public boolean isValidated() {
+		return validated;
+	}
+
+	public void setValidated(boolean validated) {
+		this.validated = validated;
+	}
+
+	public boolean isProcessed() {
+		return processed;
+	}
+
+	public void setProcessed(boolean processed) {
+		this.processed = processed;
+	}
+
+	public boolean isInfoExtracted() {
+		return infoExtracted;
+	}
+
+	public void setInfoExtracted(boolean infoExtracted) {
+		this.infoExtracted = infoExtracted;
+	}
+
+	public boolean isDocClassified() {
+		return docClassified;
+	}
+
+	public void setDocClassified(boolean docClassified) {
+		this.docClassified = docClassified;
 	}
 	
 	

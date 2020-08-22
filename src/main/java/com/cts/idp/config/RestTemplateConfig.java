@@ -11,7 +11,7 @@ import org.springframework.web.util.UriTemplateHandler;
 @Configuration
 public class RestTemplateConfig {
 
-    private static final String baseUrl = "http://localhost:9091/idp/storage";
+    private static final String baseUrl = "http://localhost:9092/mock";
 
     @Bean
     RestTemplate restTemplate(RestTemplateBuilder builder) {
