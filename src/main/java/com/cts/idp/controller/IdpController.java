@@ -94,4 +94,9 @@ public class IdpController {
 		Customer cust = service.processFiles(userId);
 		return ResponseEntity.status(HttpStatus.OK).body(cust);
 	}
+	@GetMapping("/dashboard")
+	public ResponseEntity<List<Files>> getAdminDashboard() {
+		List<Files> files = service.getDashboard();
+		return ResponseEntity.status(HttpStatus.OK).body(files);
+	}
 }

@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    config:
+      server:
+        # This flag indicates that the server should configure itself from its own remote repository
+        bootstrap: true
+        git:
+          uri: https://github.com/deb82banerjee/IntelliDoc-config
+          
+        

@@ -82,6 +82,7 @@ public class FileService {
 		for(Files file : files) {
 			FileDetailsDao details = restTemplate.postForObject("/process", file, FileDetailsDao.class); //TODO: call Shuvrangshu's service for processing
 			details.setFileName(file.getFileName());
+			
 			fileDetails.add(details);
 			updateFileData(details,userId);
 			custMap.put(file.getFileName(), details.getCustomerDetails());
@@ -91,7 +92,8 @@ public class FileService {
 	}
 	private void updateFileData(FileDetailsDao details, String userId) {
 		// TODO Auto-generated method stub
-		fileRepo.updateByUserIdFileName(details.isInformationExtacted(), false, true, details.isDocumentClassified(), userId, details.getFileName());
+		String customerName = details.getCustomerDetails().getFirstName()+" "+ details.getCustomerDetails().getMiddleName()+" "+details.getCustomerDetails().getLastName();
+		fileRepo.updateByUserIdFileName(details.isInformationExtacted(), false, true, details.isDocumentClassified(), customerName, userId, details.getFileName());
 		
 	}
 	private Customer processClassfiedData(Map<String, CustomerDetailsDao> custMap, String userId) {
@@ -101,6 +103,7 @@ public class FileService {
 				if(!StringUtils.isEmpty(customer.getFirstName())){
 					if(!customer.getFirstName().equalsIgnoreCase(map.getValue().getFirstName())) {
 						customer.setMessage("Mismatch in Customer First Name in the documents!!");
+						fileRepo.updateProcessedToFalse(false,userId,map.getKey());//Updating file status to be non-processed
 					}
 				}else {
 					customer.setFirstName(map.getValue().getFirstName());
@@ -109,6 +112,7 @@ public class FileService {
 					customer.setAddress(map.getValue().getAddress());
 					customer.setUserId(userId);
 					customer.setDob(map.getValue().getDob());
+					fileRepo.updateProcessedToFalse(true,userId,map.getKey());//Updating file status to be processed
 				}
 			}
 		});
@@ -118,6 +122,10 @@ public class FileService {
 		}
 		return customer;
 		
+	}
+	public List<Files> getDashboard() {
+		// TODO Auto-generated method stub
+		return fileRepo.findAll();
 	}
 	
 	
