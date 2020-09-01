@@ -1,5 +1,9 @@
 package com.cts.idp.service;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,7 +11,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +26,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 
 import com.cts.idp.controller.IdpController;
 import com.cts.idp.dao.CustomerDetailsDao;
+import com.cts.idp.dao.DummyResponse;
 import com.cts.idp.dao.FileDetailsDao;
 import com.cts.idp.model.Customer;
 import com.cts.idp.model.FileInfo;
@@ -79,17 +91,40 @@ public class FileService {
 		List<Files> files = fileRepo.findByUserId(userId);
 		Map<String, CustomerDetailsDao> custMap = new HashMap<>();
 		List<FileDetailsDao> fileDetails = new ArrayList<FileDetailsDao>();
+		DummyResponse details = null;
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+
 		for(Files file : files) {
-			FileDetailsDao details = restTemplate.postForObject("/process", file, FileDetailsDao.class); //TODO: call Shuvrangshu's service for processing
-			details.setFileName(file.getFileName());
+			//FileDetailsDao details = restTemplate.postForObject("/file_upload", file, FileDetailsDao.class); //TODO: call Shuvrangshu's service for processing
+			try {
+				FileSystemResource fileResource = getFileSystemResource(file.getFileName(), file.getData());
+				body.add("file", fileResource);
+				HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+				details = restTemplate.postForObject ("/file-upload",requestEntity, DummyResponse.class); //TODO: call Shuvrangshu's service for processing
+				System.out.println("Result---->"+details.getMessage());
+				fileResource.getFile().delete();
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+			/*details.setFileName(file.getFileName());
 			
 			fileDetails.add(details);
 			updateFileData(details,userId);
-			custMap.put(file.getFileName(), details.getCustomerDetails());
+			custMap.put(file.getFileName(), details.getCustomerDetails());*/
 		}
-		Customer customer =  processClassfiedData(custMap, userId);
-		return customer; 
+		//Customer customer =  processClassfiedData(custMap, userId);
+		return null;//customer; 
 	}
+	private FileSystemResource getFileSystemResource(String fileName, byte[] data) throws IOException {
+        File convFile = new File(fileName);
+        FileOutputStream fos = new FileOutputStream(convFile);
+        fos.write(data);
+        fos.close();
+        return new FileSystemResource(convFile);
+    }
+	
 	private void updateFileData(FileDetailsDao details, String userId) {
 		// TODO Auto-generated method stub
 		String customerName = details.getCustomerDetails().getFirstName()+" "+ details.getCustomerDetails().getMiddleName()+" "+details.getCustomerDetails().getLastName();

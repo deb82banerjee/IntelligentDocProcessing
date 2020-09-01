@@ -1,15 +1,23 @@
 package com.cts.idp.controller;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -63,6 +71,7 @@ public class IdpController {
 	public ResponseEntity<ResponseMessage> uploadDocument(@RequestParam("file") MultipartFile file, @RequestParam("userId") String userId) {
 		String message = "";
 		boolean successful = service.storeFiles(file, userId);
+		
 		if (successful) {
 			message = "Uploaded the file successfully: " + file.getOriginalFilename();
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
@@ -99,4 +108,5 @@ public class IdpController {
 		List<Files> files = service.getDashboard();
 		return ResponseEntity.status(HttpStatus.OK).body(files);
 	}
+    
 }
