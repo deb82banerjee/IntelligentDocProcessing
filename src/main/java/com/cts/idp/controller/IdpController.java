@@ -1,23 +1,15 @@
 package com.cts.idp.controller;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -107,6 +99,14 @@ public class IdpController {
 	public ResponseEntity<List<Files>> getAdminDashboard() {
 		List<Files> files = service.getDashboard();
 		return ResponseEntity.status(HttpStatus.OK).body(files);
+	}
+	@GetMapping("/validate")
+	public ResponseEntity<ResponseMessage> validateDetails(@RequestParam("userId") String userId) {
+		boolean validated = service.validateDetails(userId);
+		if(validated) {
+			return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("Validation Successful!!"));
+		}
+		return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage("Problem occured while validating!!"));
 	}
     
 }

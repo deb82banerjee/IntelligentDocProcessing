@@ -13,7 +13,7 @@ public class FileDetailsDao {
 	
 	
 	public FileDetailsDao(String fileName, String fileType, boolean isInformationExtacted, boolean isDocumentClassified,
-			boolean isDocumentVerified, CustomerDetailsDao customerDetails, String message) {
+			boolean isDocumentVerified, CustomerDetailsDao customerDetails) {
 		super();
 		this.fileName = fileName;
 		this.fileType = fileType;

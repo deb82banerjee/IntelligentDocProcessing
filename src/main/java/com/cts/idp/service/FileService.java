@@ -3,15 +3,15 @@ package com.cts.idp.service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -49,8 +49,12 @@ public class FileService {
 	public boolean storeFiles(MultipartFile file, String userId) {
 		boolean isSuccess = false;
 		try {
+			userId = "SR"+userId;
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+			Date date = new Date();
+			String strDate= formatter.format(date);
 			String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-			Files dbFile = new Files(userId, fileName,file.getContentType(),"",false,false,false,false,file.getBytes());
+			Files dbFile = new Files(userId, fileName,file.getContentType(),"",false,false,false,false,file.getBytes(), strDate);
 			fileRepo.save(dbFile);
 			isSuccess = true;
 		}catch(Exception e) {
@@ -73,7 +77,7 @@ public class FileService {
 	}
 	
 	public Files loadFile(String fileName, String userId) {
-		Files file = fileRepo.findByFileNameUserId(fileName, userId);
+		Files file = fileRepo.findByFileNameUserId(userId, fileName);
 		return file;
 	}
 	public boolean deleteFile(String fileName, String userId) {
@@ -88,34 +92,44 @@ public class FileService {
 	}
 	public Customer processFiles(String userId) {
 		//Need to send to Processing Engine
+		userId="SR"+userId;
 		List<Files> files = fileRepo.findByUserId(userId);
 		Map<String, CustomerDetailsDao> custMap = new HashMap<>();
 		List<FileDetailsDao> fileDetails = new ArrayList<FileDetailsDao>();
-		DummyResponse details = null;
+		DummyResponse dummyDetails = null;
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
 		for(Files file : files) {
-			//FileDetailsDao details = restTemplate.postForObject("/file_upload", file, FileDetailsDao.class); //TODO: call Shuvrangshu's service for processing
-			try {
-				FileSystemResource fileResource = getFileSystemResource(file.getFileName(), file.getData());
-				body.add("file", fileResource);
-				HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-				details = restTemplate.postForObject ("/file-upload",requestEntity, DummyResponse.class); //TODO: call Shuvrangshu's service for processing
-				System.out.println("Result---->"+details.getMessage());
-				fileResource.getFile().delete();
-			}catch(Exception e) {
-				e.printStackTrace();
-			}
-			/*details.setFileName(file.getFileName());
+			/*
+			 * try { FileSystemResource fileResource =
+			 * getFileSystemResource(file.getFileName(), file.getData()); body.add("file",
+			 * fileResource); HttpEntity<MultiValueMap<String, Object>> requestEntity = new
+			 * HttpEntity<>(body, headers); dummyDetails = restTemplate.postForObject
+			 * ("/file-upload",requestEntity, DummyResponse.class); //TODO: call
+			 * Shuvrangshu's service for processing
+			 * System.out.println("Result ****---->"+dummyDetails.getMessage());
+			 * fileResource.getFile().delete(); }catch(Exception e) { e.printStackTrace(); }
+			 */
+			
+			FileDetailsDao details = getDummyResponse(); //TODO: call Shuvrangshu's service for processing
+			details.setFileName(file.getFileName());
 			
 			fileDetails.add(details);
 			updateFileData(details,userId);
-			custMap.put(file.getFileName(), details.getCustomerDetails());*/
+			custMap.put(file.getFileName(), details.getCustomerDetails());
+			
 		}
-		//Customer customer =  processClassfiedData(custMap, userId);
-		return null;//customer; 
+		Customer customer =  processClassfiedData(custMap, userId);
+		return customer; 
+	}
+	private FileDetailsDao getDummyResponse() {
+		// TODO Auto-generated method stub
+		CustomerDetailsDao custDetails = new CustomerDetailsDao("","Sachin","Tendulkar","Ramesh","01/01/1990","Kolkata, West Bengal, 700091");
+		FileDetailsDao fileDetails = new FileDetailsDao("abc.jpg","Pan",true,true,false,custDetails);
+		return fileDetails;
+		
 	}
 	private FileSystemResource getFileSystemResource(String fileName, byte[] data) throws IOException {
         File convFile = new File(fileName);
@@ -160,7 +174,25 @@ public class FileService {
 	}
 	public List<Files> getDashboard() {
 		// TODO Auto-generated method stub
-		return fileRepo.findAll();
+		List<Files> fileList = fileRepo.findAll();
+		List<Files> newFileList = fileList.stream().map(file ->{
+			String url = MvcUriComponentsBuilder
+			          .fromMethodName(IdpController.class, "getFile", file.getFileName(),file.getUserId()).build().toString();
+			file.setUrl(url);
+			return file;
+		}).collect(Collectors.toList());
+		
+		return newFileList;
+	}
+	public boolean validateDetails(String userId) {
+		// TODO Auto-generated method stub
+		userId = "SR"+userId;
+		try {
+			fileRepo.validateCustomerDetails(true, userId);
+			return true;
+		}catch(Exception e) {
+			return false;
+		}
 	}
 	
 	

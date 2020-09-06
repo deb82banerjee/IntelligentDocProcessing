@@ -28,6 +28,7 @@ public class Customer {
 		// TODO Auto-generated constructor stub
 	}
 	
+	
 	public String getUserId() {
 		return userId;
 	}

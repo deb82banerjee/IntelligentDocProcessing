@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.Transient;
 
 @Entity
 public class Files {
@@ -29,15 +30,20 @@ public class Files {
 	
 	private boolean docClassified;
 	
+	private String requestedDate;
+	
 	
 	
 	@Lob
 	private byte[] data;
+	
+	@Transient
+	private String url;
 
 	
 
 	public Files(String userId, String fileName, String fileType, String customerName, boolean validated,
-			boolean processed, boolean infoExtracted, boolean docClassified, byte[] data) {
+			boolean processed, boolean infoExtracted, boolean docClassified, byte[] data, String requestedDate) {
 		super();
 		this.userId = userId;
 		this.fileName = fileName;
@@ -48,6 +54,7 @@ public class Files {
 		this.infoExtracted = infoExtracted;
 		this.docClassified = docClassified;
 		this.data = data;
+		this.requestedDate = requestedDate;
 	}
 
 	public Files() {
@@ -132,6 +139,22 @@ public class Files {
 
 	public void setDocClassified(boolean docClassified) {
 		this.docClassified = docClassified;
+	}
+
+	public String getRequestedDate() {
+		return requestedDate;
+	}
+
+	public void setRequestedDate(String requestedDate) {
+		this.requestedDate = requestedDate;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 	
 	

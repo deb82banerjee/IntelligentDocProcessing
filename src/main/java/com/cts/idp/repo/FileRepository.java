@@ -30,5 +30,9 @@ public interface FileRepository extends JpaRepository<Files, Integer> {
 	@Query("Update Files set processed = ?1 where userId = ?2 and fileName = ?3")
 	void updateProcessedToFalse(boolean isProcessed, String userId, String key);
 	
-	
+	@Modifying
+	@Transactional
+	@Query("Update Files set validated = ?1 where userId = ?2")
+	void validateCustomerDetails(Boolean validated,String userId);
+
 }
